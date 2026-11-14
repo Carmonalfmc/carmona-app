@@ -709,6 +709,7 @@ TELAS.ficha = async ({ id }) => {
     <div class="botoes"><button class="btn" id="novaP" style="margin-top:4px">Nova partida</button><button class="btn sec" id="novaA" style="margin-top:4px">Nova avaliação</button></div>
     <button class="btn" id="scoutBtn">${SC && SC.alunoId === id ? 'Continuar scout (' + SC.pontos.length + ' pontos)' : 'Scout ao vivo'}</button>
     <button class="btn sec" id="evol">Ver evolução</button>
+    <h2>Quer evoluir em</h2><div id="temas" class="card"></div>
     <h2>Partidas (${partidas.length})</h2>
     ${partidas.length ? partidas.map(itemPartida).join('') : '<div class="card vazio">Nenhuma partida ainda.</div>'}
     <h2>Avaliações (${avals.length})</h2>
@@ -719,6 +720,7 @@ TELAS.ficha = async ({ id }) => {
   $('#evol').onclick = () => ir('evolucao', { alunoId: id });
   $('#scoutBtn').onclick = () => SC && SC.alunoId === id ? ir('scout') : ir('scoutNovo', { alunoId: id });
   ligarPartidas(id);
+  carregarTemasFicha(id);
   app.querySelectorAll('[data-aval]').forEach(el => el.onclick = () => ir('novaAvaliacao', { alunoId: id, avaliacaoId: el.dataset.aval }));
   $('#salvarNivel').onclick = async e => {
     const b = e.target; trancar(b, 'Salvando...');
@@ -1224,41 +1226,69 @@ function verPonto(i) {
   box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ===== Onde quero evoluir (aluno) e turmas (professor) =====
+
 async function carregarTurmas() {
   const { data, error } = await sb.from('turmas').select('*').order('nome');
   if (error) return [];
   return data || [];
 }
 
+// ===== Onde quero evoluir (aluno) =====
+const TEMAS_ALUNO = [
+  { id: 'direita', titulo: 'Minha direita (forehand)', blocos: [
+    { pergunta: 'Qual efeito da sua direita você quer melhorar?', opcoes: [['direita.efeito.topspin','Com efeito (topspin)'], ['direita.efeito.slice','Cortada (slice)']] },
+    { pergunta: 'Em qual bola você sente mais dificuldade?', opcoes: [['direita.bola.alta','Bola alta'], ['direita.bola.baixa','Bola baixa'], ['direita.bola.ataque','Bola de ataque'], ['direita.bola.defesa','Bola de defesa']] }
+  ] },
+  { id: 'esquerda', titulo: 'Minha esquerda (backhand)', blocos: [
+    { pergunta: 'Qual efeito da sua esquerda você quer melhorar?', opcoes: [['esquerda.efeito.topspin','Com efeito (topspin)'], ['esquerda.efeito.slice','Cortada (slice)']] },
+    { pergunta: 'Em qual bola você sente mais dificuldade?', opcoes: [['esquerda.bola.alta','Bola alta'], ['esquerda.bola.baixa','Bola baixa'], ['esquerda.bola.ataque','Bola de ataque'], ['esquerda.bola.defesa','Bola de defesa']] }
+  ] },
+  { id: 'saque', titulo: 'Meu saque', blocos: [
+    { pergunta: 'O que acontece com o seu saque?', opcoes: [['saque.primeiro','Primeiro saque não entra o suficiente'], ['saque.segundo','Segundo saque sem segurança'], ['saque.fundo','Ele sai do fundo da quadra'], ['saque.rede','Ele fica na rede']] }
+  ] },
+  { id: 'situacoes', titulo: 'Situações do jogo', blocos: [
+    { pergunta: 'Em que situação você sente mais dificuldade?', opcoes: [['situacao.subida','Quando subo à rede'], ['situacao.defesa','Quando estou defendendo'], ['situacao.ataque','Quando estou atacando'], ['situacao.construir','Quando preciso construir o ponto'], ['situacao.volume','Quando erro muito rápido']] }
+  ] }
+];
+
+function rotuloTema(codigo) {
+  for (const g of TEMAS_ALUNO) for (const b of g.blocos) for (const [c, t] of b.opcoes) if (c === codigo) return { grupo: g.titulo, texto: t };
+  return { grupo: '', texto: codigo };
+}
+
 TELAS.evoluir = async () => {
   carregando();
   const p = S.perfil;
-  const { data: me } = await sb.from('perfis').select('turma_id').eq('id', p.id).single();
-  const turmaId = me && me.turma_id;
-  const [fRes, eRes] = await Promise.all([
-    sb.from('focos_treino').select('*').eq('ativo', true)
-      .or(turmaId ? `turma_id.is.null,turma_id.eq.${turmaId}` : 'turma_id.is.null').order('ordem'),
-    sb.from('escolhas_foco').select('foco_id').eq('aluno_id', p.id)
-  ]);
-  if (fRes.error) throw fRes.error;
-  const focos = fRes.data || [];
-  const escolhidos = new Set((eRes.data || []).map(x => x.foco_id));
-  const cats = [...new Set(focos.map(f => f.categoria || 'Outros'))];
+  const { data, error } = await sb.from('escolhas_tema').select('tema').eq('aluno_id', p.id);
+  if (error) throw error;
+  const escolhidos = new Set((data || []).map(x => x.tema));
   app.innerHTML = `<button class="link voltar" id="voltar">‹ Painel</button>
     <h1>Onde quero evoluir</h1>
-    <p class="sub">Escolha os pontos que você quer treinar. O professor usa essas escolhas para montar as próximas aulas.</p>
-    ${focos.length ? cats.map(c => `<h2>${esc(c)}</h2><div class="chips">${focos.filter(f => (f.categoria || 'Outros') === c).map(f => `<button class="chip ${escolhidos.has(f.id) ? 'on' : ''}" data-foco="${f.id}">${esc(f.titulo)}</button>`).join('')}</div>`).join('') : '<div class="card vazio">Ainda não há focos cadastrados para a sua turma.</div>'}`;
+    <p class="sub">Toque no que faz sentido para você. Pode marcar mais de um. Você pode mudar quando quiser.</p>
+    ${TEMAS_ALUNO.map(g => `<h2>${esc(g.titulo)}</h2>${g.blocos.map(b => `<p class="sub" style="margin:14px 0 8px;color:#D4D4D4">${esc(b.pergunta)}</p><div class="chips">${b.opcoes.map(([c, t]) => `<button class="chip ${escolhidos.has(c) ? 'on' : ''}" data-tema="${c}">${esc(t)}</button>`).join('')}</div>`).join('')}`).join('')}`;
   $('#voltar').onclick = () => ir('painel');
-  app.querySelectorAll('[data-foco]').forEach(el => el.onclick = async () => {
-    const id = el.dataset.foco, ligado = el.classList.contains('on');
+  app.querySelectorAll('[data-tema]').forEach(el => el.onclick = async () => {
+    const c = el.dataset.tema, ligado = el.classList.contains('on');
     el.classList.toggle('on');
     const r = ligado
-      ? await sb.from('escolhas_foco').delete().eq('aluno_id', p.id).eq('foco_id', id)
-      : await sb.from('escolhas_foco').insert({ aluno_id: p.id, foco_id: id });
+      ? await sb.from('escolhas_tema').delete().eq('aluno_id', p.id).eq('tema', c)
+      : await sb.from('escolhas_tema').insert({ aluno_id: p.id, tema: c });
     if (r.error) { el.classList.toggle('on'); toast(erroAmigavel(r.error), true); }
   });
 };
+
+// Professor: temas escolhidos pelo aluno (na ficha)
+async function carregarTemasFicha(id) {
+  const el = $('#temas');
+  if (!el) return;
+  const { data, error } = await sb.from('escolhas_tema').select('tema').eq('aluno_id', id);
+  if (error) { el.innerHTML = '<span class="sub">Não foi possível carregar.</span>'; return; }
+  if (!data || !data.length) { el.innerHTML = '<span class="sub">O aluno ainda não escolheu temas.</span>'; return; }
+  const grupos = {};
+  data.forEach(x => { const r = rotuloTema(x.tema); (grupos[r.grupo] = grupos[r.grupo] || []).push(r.texto); });
+  el.innerHTML = Object.entries(grupos).map(([g, itens]) => `<div style="margin-bottom:10px"><span class="sub" style="display:block">${esc(g)}</span>${itens.map(t => esc(t)).join(' · ')}</div>`).join('');
+}
+
 </script>
 </body>
 </html>
