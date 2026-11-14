@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CARMONA</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <meta name="description" content="Plataforma CARMONA: estatísticas e evolução dos alunos de tênis.">
 <meta name="theme-color" content="#0A0A0A">
 <meta name="mobile-web-app-capable" content="yes">
@@ -21,7 +23,7 @@
 html,body{background:var(--fundo);color:var(--texto);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
 .hidden{display:none!important}
 .topo{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));background:rgba(10,10,10,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--borda)}
-.marca{font-weight:700;letter-spacing:.32em;font-size:14px}
+.marca{width:56px;height:22px;background:#000 url(logo.png) no-repeat -13.1px -28.8px/77px 77px;mix-blend-mode:screen;flex:none}
 #topo-sub{font-size:12px;color:var(--texto-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 main{max-width:720px;margin:0 auto;padding:16px 16px calc(100px + env(safe-area-inset-bottom))}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;justify-content:space-around;background:var(--superficie);border-top:1px solid var(--borda);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
@@ -54,7 +56,7 @@ input[type=date]{min-height:46px}
 .botoes .btn{flex:1}
 .link{background:none;border:0;color:var(--dourado);font:500 14px 'Inter',sans-serif;cursor:pointer;padding:0}
 .tela-entrada{min-height:82vh;display:flex;flex-direction:column;justify-content:center;max-width:400px;margin:0 auto}
-.logo-grande{font-size:28px;font-weight:700;letter-spacing:.35em;text-align:center;margin-bottom:10px;padding-left:.35em}
+.logo-grande{width:220px;height:86px;margin:0 auto 18px;background:#000 url(logo.png) no-repeat -51.5px -113.2px/302.5px 302.5px;mix-blend-mode:screen}
 .linha-ouro{width:40px;height:2px;background:var(--dourado);margin:0 auto 32px}
 .lista-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--superficie);border:1px solid var(--borda);border-radius:var(--raio);margin-bottom:8px;cursor:pointer}
 .lista-item .t{font-weight:600}
@@ -101,7 +103,7 @@ input[type=date]{min-height:46px}
 </style>
 </head>
 <body>
-<header id="topo" class="topo hidden"><span class="marca">CARMONA</span><span id="topo-sub"></span></header>
+<header id="topo" class="topo hidden"><div class="marca" role="img" aria-label="CARMONA"></div><span id="topo-sub"></span></header>
 <main id="app"><div class="carregando"><div class="spin"></div></div></main>
 <nav id="nav" class="nav hidden"></nav>
 <div id="toast" class="toast"></div>
@@ -242,7 +244,7 @@ async function rotear(session) {
 
 TELAS.entrar = () => {
   app.innerHTML = `<div class="tela-entrada">
-    <div class="logo-grande">CARMONA</div><div class="linha-ouro"></div>
+    <div class="logo-grande" role="img" aria-label="CARMONA"></div><div class="linha-ouro"></div>
     <h1>Entrar</h1><p class="sub">Acompanhe suas partidas e sua evolução no tênis.</p>
     <form id="f">
       <label for="email">E-mail</label><input id="email" type="email" name="email" autocomplete="email" required>
@@ -262,7 +264,7 @@ TELAS.entrar = () => {
 
 TELAS.cadastro = () => {
   app.innerHTML = `<div class="tela-entrada">
-    <div class="logo-grande">CARMONA</div><div class="linha-ouro"></div>
+    <div class="logo-grande" role="img" aria-label="CARMONA"></div><div class="linha-ouro"></div>
     <h1>Criar conta</h1><p class="sub">Depois do cadastro, o professor libera o seu acesso.</p>
     <form id="f">
       <label>Nome completo</label><input name="nome" autocomplete="name" required>
@@ -285,7 +287,7 @@ TELAS.cadastro = () => {
     });
     if (error) { toast(erroAmigavel(error), true); soltar(b); return; }
     if (!data.session) {
-      app.innerHTML = `<div class="tela-entrada"><div class="logo-grande">CARMONA</div><div class="linha-ouro"></div><h1>Conta criada</h1><p class="sub">Confirme o seu e-mail pelo link que enviamos e depois entre no app.</p><button class="btn" id="ok">Ir para Entrar</button></div>`;
+      app.innerHTML = `<div class="tela-entrada"><div class="logo-grande" role="img" aria-label="CARMONA"></div><div class="linha-ouro"></div><h1>Conta criada</h1><p class="sub">Confirme o seu e-mail pelo link que enviamos e depois entre no app.</p><button class="btn" id="ok">Ir para Entrar</button></div>`;
       $('#ok').onclick = TELAS.entrar;
     }
   };
@@ -293,7 +295,7 @@ TELAS.cadastro = () => {
 
 TELAS.esqueci = () => {
   app.innerHTML = `<div class="tela-entrada">
-    <div class="logo-grande">CARMONA</div><div class="linha-ouro"></div>
+    <div class="logo-grande" role="img" aria-label="CARMONA"></div><div class="linha-ouro"></div>
     <h1>Recuperar senha</h1><p class="sub">Enviamos um link para você criar uma senha nova.</p>
     <form id="f"><label>E-mail</label><input type="email" name="email" autocomplete="email" required>
     <button class="btn" type="submit">Enviar link</button></form>
@@ -311,7 +313,7 @@ TELAS.esqueci = () => {
 
 TELAS.novaSenha = () => {
   app.innerHTML = `<div class="tela-entrada">
-    <div class="logo-grande">CARMONA</div><div class="linha-ouro"></div>
+    <div class="logo-grande" role="img" aria-label="CARMONA"></div><div class="linha-ouro"></div>
     <h1>Nova senha</h1><p class="sub">Escolha uma senha com pelo menos 6 caracteres.</p>
     <form id="f"><label>Nova senha</label><input type="password" name="s1" autocomplete="new-password" minlength="6" required>
     <label>Repita a senha</label><input type="password" name="s2" autocomplete="new-password" minlength="6" required>
@@ -332,7 +334,7 @@ TELAS.novaSenha = () => {
 TELAS.aguardando = () => {
   const inativo = S.perfil && S.perfil.status === 'inativo';
   app.innerHTML = `<div class="tela-entrada">
-    <div class="logo-grande">CARMONA</div><div class="linha-ouro"></div>
+    <div class="logo-grande" role="img" aria-label="CARMONA"></div><div class="linha-ouro"></div>
     <h1>${inativo ? 'Acesso desativado' : 'Quase lá'}</h1>
     <p class="sub">${inativo ? 'Seu acesso está desativado no momento. Fale com o professor Carmona.' : 'Sua conta foi criada. Assim que o professor Carmona liberar o acesso, você já consegue ver suas partidas e sua evolução.'}</p>
     <button class="btn" id="atualizar">Verificar de novo</button>
