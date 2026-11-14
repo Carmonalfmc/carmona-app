@@ -252,7 +252,7 @@ async function ir(tela, params = {}) {
   limparCharts(); window.scrollTo(0, 0);
   document.body.classList.remove('sc-q');
   const prof = ehProf();
-  const aba = { painel:'painel', partidas:'partidas', partida: prof ? 'alunos' : 'partidas', evolucao: prof ? 'alunos' : 'evolucao', perfil:'perfil', alunos:'alunos', ficha:'alunos', novaPartida:'alunos', novaAvaliacao:'alunos', scoutNovo:'alunos', scout:'alunos' }[tela];
+  const aba = { painel:'painel', partidas:'partidas', partida: prof ? 'alunos' : 'partidas', evolucao: prof ? 'alunos' : 'evolucao', perfil:'perfil', alunos:'alunos', ficha:'alunos', novaPartida:'alunos', novaAvaliacao:'alunos', scoutNovo:'alunos', scout:'alunos', evoluir:'painel' }[tela];
   marcarNav(aba);
   try { await TELAS[tela](params); }
   catch (e) {
@@ -433,6 +433,7 @@ TELAS.painel = async () => {
     return `<div class="card metric"><div class="rot">${rot}</div><div class="val ${cls}">${txt} <span style="font-size:13px">${seta}</span></div></div>`;
   };
   app.innerHTML = `<p class="sub">Olá, ${esc(primeiroNome(p.nome))}</p><h1>Seu painel</h1>
+    ${ehProf() ? '' : '<button class="btn sec" onclick="ir(\'evoluir\')" style="margin-top:14px">Onde quero evoluir</button>'}
     <div class="grid2" style="margin-top:16px">
       <div class="card metric"><div class="rot">Nível</div><div class="val nivel">${p.nivel ? Number(p.nivel).toFixed(1) : '-'}</div></div>
       <div class="card metric"><div class="rot">Partidas</div><div class="val">${partidas.length}</div><div class="sub mono">${v} V · ${d} D</div></div>
@@ -691,7 +692,7 @@ TELAS.alunos = async () => {
 // ===== Professor: Ficha do aluno =====
 TELAS.ficha = async ({ id }) => {
   carregando();
-  const [a, partidas, avals] = await Promise.all([carregarPerfil(id), carregarPartidas(id), carregarAvaliacoes(id)]);
+  const [a, partidas, avals, turmas] = await Promise.all([carregarPerfil(id), carregarPartidas(id), carregarAvaliacoes(id), carregarTurmas()]);
   const v = partidas.filter(x => x.resultado === 'vitória').length, d = partidas.filter(x => x.resultado === 'derrota').length;
   const dado = (rot, val) => `<div><span>${rot}</span>${val ? esc(val) : '-'}</div>`;
   app.innerHTML = `<button class="link voltar" id="voltar">‹ Alunos</button>
@@ -704,7 +705,7 @@ TELAS.ficha = async ({ id }) => {
     <div class="card"><div class="grid2">
       <div><label style="margin-top:0">Nível oficial</label><select id="nivel">${opcoesNivel(a.nivel, true)}</select></div>
       <div><label style="margin-top:0">Status</label><select id="status">${opcoes([['ativo','Ativo'],['pendente','Pendente'],['inativo','Inativo']], a.status)}</select></div>
-    </div><button class="btn sec" id="salvarNivel" style="margin-top:12px">Salvar nível e status</button></div>
+    </div><label>Turma</label><select id="turma">${opcoes(turmas.map(t => [t.id, t.nome]), a.turma_id, true)}</select><button class="btn sec" id="salvarNivel" style="margin-top:12px">Salvar nível, status e turma</button></div>
     <div class="botoes"><button class="btn" id="novaP" style="margin-top:4px">Nova partida</button><button class="btn sec" id="novaA" style="margin-top:4px">Nova avaliação</button></div>
     <button class="btn" id="scoutBtn">${SC && SC.alunoId === id ? 'Continuar scout (' + SC.pontos.length + ' pontos)' : 'Scout ao vivo'}</button>
     <button class="btn sec" id="evol">Ver evolução</button>
@@ -721,7 +722,7 @@ TELAS.ficha = async ({ id }) => {
   app.querySelectorAll('[data-aval]').forEach(el => el.onclick = () => ir('novaAvaliacao', { alunoId: id, avaliacaoId: el.dataset.aval }));
   $('#salvarNivel').onclick = async e => {
     const b = e.target; trancar(b, 'Salvando...');
-    const { error } = await sb.from('perfis').update({ nivel: $('#nivel').value || null, status: $('#status').value }).eq('id', id);
+    const { error } = await sb.from('perfis').update({ nivel: $('#nivel').value || null, status: $('#status').value, turma_id: $('#turma').value || null }).eq('id', id);
     soltar(b);
     if (error) toast(erroAmigavel(error), true); else toast('Salvo.');
   };
@@ -1222,6 +1223,42 @@ function verPonto(i) {
   box.innerHTML = `<div class="card"><div class="sub" style="margin-bottom:8px">Ponto ${i + 1} · ${esc(p.games || '')} ${esc(p.placar || '')} · ${esc(FIM_TXT[p.desfecho])}</div>${quadraSVG(trajOver(p.trajetoria.p, p.trajetoria.f, COR_FIM[p.desfecho]))}</div>`;
   box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+
+// ===== Onde quero evoluir (aluno) e turmas (professor) =====
+async function carregarTurmas() {
+  const { data, error } = await sb.from('turmas').select('*').order('nome');
+  if (error) return [];
+  return data || [];
+}
+
+TELAS.evoluir = async () => {
+  carregando();
+  const p = S.perfil;
+  const { data: me } = await sb.from('perfis').select('turma_id').eq('id', p.id).single();
+  const turmaId = me && me.turma_id;
+  const [fRes, eRes] = await Promise.all([
+    sb.from('focos_treino').select('*').eq('ativo', true)
+      .or(turmaId ? `turma_id.is.null,turma_id.eq.${turmaId}` : 'turma_id.is.null').order('ordem'),
+    sb.from('escolhas_foco').select('foco_id').eq('aluno_id', p.id)
+  ]);
+  if (fRes.error) throw fRes.error;
+  const focos = fRes.data || [];
+  const escolhidos = new Set((eRes.data || []).map(x => x.foco_id));
+  const cats = [...new Set(focos.map(f => f.categoria || 'Outros'))];
+  app.innerHTML = `<button class="link voltar" id="voltar">‹ Painel</button>
+    <h1>Onde quero evoluir</h1>
+    <p class="sub">Escolha os pontos que você quer treinar. O professor usa essas escolhas para montar as próximas aulas.</p>
+    ${focos.length ? cats.map(c => `<h2>${esc(c)}</h2><div class="chips">${focos.filter(f => (f.categoria || 'Outros') === c).map(f => `<button class="chip ${escolhidos.has(f.id) ? 'on' : ''}" data-foco="${f.id}">${esc(f.titulo)}</button>`).join('')}</div>`).join('') : '<div class="card vazio">Ainda não há focos cadastrados para a sua turma.</div>'}`;
+  $('#voltar').onclick = () => ir('painel');
+  app.querySelectorAll('[data-foco]').forEach(el => el.onclick = async () => {
+    const id = el.dataset.foco, ligado = el.classList.contains('on');
+    el.classList.toggle('on');
+    const r = ligado
+      ? await sb.from('escolhas_foco').delete().eq('aluno_id', p.id).eq('foco_id', id)
+      : await sb.from('escolhas_foco').insert({ aluno_id: p.id, foco_id: id });
+    if (r.error) { el.classList.toggle('on'); toast(erroAmigavel(r.error), true); }
+  });
+};
 </script>
 </body>
 </html>
