@@ -982,7 +982,6 @@ TELAS.scoutNovo = async ({ alunoId }) => {
     <form id="f">
       <label>Adversário</label><select name="adversario_id" id="advSel">${opcoes([['', 'Não é aluno (digitar o nome)'], ...outros.map(o => [o.id, o.nome])], '')}</select>
       <input name="adversario" id="advNome" placeholder="Nome do adversário" style="margin-top:8px">
-      <label>Como marcar</label><select name="modo">${opcoes([['quadra', 'Na quadra, tocando onde a bola foi batida'], ['botoes', 'Botões rápidos']], 'quadra')}</select>
       <label>Formato</label><select name="formato">${opcoes(FORMATOS, 'set1')}</select>
       <label>Quem saca primeiro</label><select name="primeiro" id="primSel"><option value="aluno">${esc(an)}</option><option value="adversario">Adversário</option></select>
       <label class="check"><input type="checkbox" name="noAd"> Sem vantagem (ponto decisivo no 40 iguais)</label>
@@ -1001,7 +1000,7 @@ TELAS.scoutNovo = async ({ alunoId }) => {
     const advId = fd.get('adversario_id') || null;
     const advCompleto = advId ? advSel.options[advSel.selectedIndex].text : (fd.get('adversario') || '').trim();
     SC = { alunoId, alunoNome: an, alunoCompleto: aluno.nome, advId, advCompleto: advCompleto || null, advNome: primeiroNome(advCompleto) || 'Adversário',
-      espelho: !!advId && $('#espelho').checked, data: hoje(), modo: fd.get('modo'), cfg: { formato: fd.get('formato'), primeiro: fd.get('primeiro'), noAd: !!fd.get('noAd') },
+      espelho: !!advId && $('#espelho').checked, data: hoje(), modo: 'botoes', cfg: { formato: fd.get('formato'), primeiro: fd.get('primeiro'), noAd: !!fd.get('noAd') },
       pontos: [], est: { fase: 'saque', saque: 1, rally: 0 } };
     salvarSC(); ir('scout');
   };
@@ -1020,7 +1019,7 @@ TELAS.scout = async () => {
   const R = () => TELAS.scout();
   const pl = placarDe(SC.cfg, SC.pontos.map(p => p.vencedor));
   const nome = l => l === 'aluno' ? SC.alunoNome : SC.advNome;
-  const naQuadra = SC.modo === 'quadra' && !pl.fim;
+  const naQuadra = false;
   document.body.classList.toggle('sc-q', naQuadra);
   if (naQuadra) { scQuadra(pl, nome, R); return; }
   const e = SC.est, sac = pl.sacador;
@@ -1042,8 +1041,8 @@ TELAS.scout = async () => {
     const f = e.fim, d = e.det, erro = f.tipo !== 'winner';
     const grupo = (g, lista) => `<div class="chips" data-g="${g}">${lista.map(([v, t]) => `<button class="chip ${d[g] === v ? 'on' : ''}" data-v="${v}">${t}</button>`).join('')}</div>`;
     corpo = `<div class="sc-tit">${FIM_TXT[f.tipo]} de ${esc(nome(f.autor))}</div><p class="sub" style="text-align:center">Ponto para ${esc(nome(erro ? outro(f.autor) : f.autor))}</p>
-      ${erro ? `<div class="rot-g">Onde a bola foi</div>${grupo('destino', DESTINOS)}` : ''}
       <div class="rot-g">Golpe</div>${grupo('lado_golpe', LADOS)}
+      ${erro ? `<div class="rot-g">Onde a bola foi</div>${grupo('destino', DESTINOS)}` : ''}
       <div class="rot-g">Situação</div>${grupo('situacao', SITUACOES)}
       <div class="rot-g">Onde ${esc(nome(f.autor))} estava na quadra</div>
       <div class="zonas" data-g="zona"><div class="sc-rede">rede</div>${ZONAS.map(([v, t, ds]) => `<button class="zona z-${v} ${d.zona === v ? 'on' : ''}" data-v="${v}">${t}<small>${ds}</small></button>`).join('')}</div>
@@ -1055,7 +1054,7 @@ TELAS.scout = async () => {
     ${corpo}
     <div class="botoes" style="margin-top:22px"><button class="btn sec peq" id="scUndo" style="flex:1">Desfazer</button>${pl.fim ? '' : '<button class="btn sec peq" id="scFim" style="flex:1">Encerrar e salvar</button>'}</div>
     ${ult.length ? `<div style="margin-top:14px">${ult.map((p, i) => `<div class="sc-log">${SC.pontos.length - i}. ${esc(descPonto(p, nome))}</div>`).join('')}</div>` : ''}
-    <div style="text-align:center;margin-top:18px">${pl.fim ? '' : '<button class="link" id="scModo" style="font-size:13px;margin-right:18px">Marcar na quadra</button>'}<button class="link" id="scDesc" style="color:var(--negativo);font-size:13px">Descartar scout</button></div>`;
+    <div style="text-align:center;margin-top:18px"><button class="link" id="scDesc" style="color:var(--negativo);font-size:13px">Descartar scout</button></div>`;
   const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn; };
   on('#scSair', () => ir('ficha', { id: SC.alunoId }));
   on('#scIn', () => { e.fase = 'rally'; e.rally = 1; salvarSC(); R(); });
@@ -1075,7 +1074,6 @@ TELAS.scout = async () => {
   on('#scUndo', () => { if (e.fase !== 'saque' || e.saque === 2) SC.est = { fase: 'saque', saque: 1, rally: 0 }; else SC.pontos.pop(); salvarSC(); R(); });
   on('#scFim', ev => { if (!SC.pontos.length) { toast('Nenhum ponto marcado ainda.', true); return; } confirmar(ev.target, 'Toque de novo para salvar', () => scoutSalvar(ev.target)); });
   on('#scSalvar', ev => scoutSalvar(ev.target));
-  on('#scModo', () => { SC.modo = 'quadra'; SC.est = { fase: 'saque', saque: 1, rally: 0 }; salvarSC(); R(); });
   on('#scDesc', ev => confirmar(ev.target, 'Toque de novo para descartar tudo', () => { const id = SC.alunoId; SC = null; salvarSC(); ir('ficha', { id }); }));
 };
 
