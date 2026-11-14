@@ -240,8 +240,8 @@ function mostrarTopo(on) { $('#topo').classList.toggle('hidden', !on); $('#topo-
 function esconderNav() { $('#nav').classList.add('hidden'); }
 function montarNav() {
   const nav = $('#nav');
-  const abas = ehProf() ? [['alunos','Alunos'],['perfil','Perfil']] : [['painel','Painel'],['partidas','Partidas'],['evolucao','Evolução'],['perfil','Perfil']];
-  nav.innerHTML = abas.map(([k, t]) => `<button data-aba="${k}">${ICON[k]}<span>${t}</span></button>`).join('');
+  const abas = ehProf() ? [['alunos','Alunos'],['planejamento','Planejamento'],['perfil','Perfil']] : [['painel','Painel'],['partidas','Partidas'],['evolucao','Evolução'],['perfil','Perfil']];
+  nav.innerHTML = abas.map(([k, t]) => `<button data-aba="${k}">${ICON[k] || ICON.alunos}<span>${t}</span></button>`).join('');
   nav.querySelectorAll('button').forEach(b => b.onclick = () => ir(b.dataset.aba));
   nav.classList.remove('hidden');
 }
@@ -252,7 +252,7 @@ async function ir(tela, params = {}) {
   limparCharts(); window.scrollTo(0, 0);
   document.body.classList.remove('sc-q');
   const prof = ehProf();
-  const aba = { painel:'painel', partidas:'partidas', partida: prof ? 'alunos' : 'partidas', evolucao: prof ? 'alunos' : 'evolucao', perfil:'perfil', alunos:'alunos', ficha:'alunos', novaPartida:'alunos', novaAvaliacao:'alunos', scoutNovo:'alunos', scout:'alunos', evoluir:'painel' }[tela];
+  const aba = { painel:'painel', partidas:'partidas', partida: prof ? 'alunos' : 'partidas', evolucao: prof ? 'alunos' : 'evolucao', perfil:'perfil', alunos:'alunos', ficha:'alunos', novaPartida:'alunos', novaAvaliacao:'alunos', scoutNovo:'alunos', scout:'alunos', evoluir:'painel', planejamento:'planejamento' }[tela];
   marcarNav(aba);
   try { await TELAS[tela](params); }
   catch (e) {
@@ -1259,14 +1259,25 @@ function rotuloTema(codigo) {
 TELAS.evoluir = async () => {
   carregando();
   const p = S.perfil;
-  const { data, error } = await sb.from('escolhas_tema').select('tema').eq('aluno_id', p.id);
+  const [{ data: t, error }, { data: meu }, turmas] = await Promise.all([
+    sb.from('escolhas_tema').select('tema').eq('aluno_id', p.id),
+    sb.from('perfis').select('turma_id').eq('id', p.id).single(),
+    carregarTurmas()
+  ]);
   if (error) throw error;
-  const escolhidos = new Set((data || []).map(x => x.tema));
+  const escolhidos = new Set((t || []).map(x => x.tema));
+  const turmaAtual = meu ? meu.turma_id : null;
   app.innerHTML = `<button class="link voltar" id="voltar">‹ Painel</button>
     <h1>Onde quero evoluir</h1>
-    <p class="sub">Toque no que faz sentido para você. Pode marcar mais de um. Você pode mudar quando quiser.</p>
-    ${TEMAS_ALUNO.map(g => `<h2>${esc(g.titulo)}</h2>${g.blocos.map(b => `<p class="sub" style="margin:14px 0 8px;color:#D4D4D4">${esc(b.pergunta)}</p><div class="chips">${b.opcoes.map(([c, t]) => `<button class="chip ${escolhidos.has(c) ? 'on' : ''}" data-tema="${c}">${esc(t)}</button>`).join('')}</div>`).join('')}`).join('')}`;
+    <p class="sub">Escolha sua turma e toque no que faz sentido para você. Pode marcar mais de um. Você pode mudar quando quiser.</p>
+    <h2>Minha turma</h2>
+    <select id="minhaTurma">${opcoes(turmas.map(x => [x.id, `${x.nome} · ${x.unidade} · ${x.horario}`]), turmaAtual, true)}</select>
+    ${TEMAS_ALUNO.map(g => `<h2>${esc(g.titulo)}</h2>${g.blocos.map(b => `<p class="sub" style="margin:14px 0 8px;color:#D4D4D4">${esc(b.pergunta)}</p><div class="chips">${b.opcoes.map(([c, tx]) => `<button class="chip ${escolhidos.has(c) ? 'on' : ''}" data-tema="${c}">${esc(tx)}</button>`).join('')}</div>`).join('')}`).join('')}`;
   $('#voltar').onclick = () => ir('painel');
+  $('#minhaTurma').onchange = async e => {
+    const { error: er } = await sb.from('perfis').update({ turma_id: e.target.value || null }).eq('id', p.id);
+    if (er) toast(erroAmigavel(er), true); else toast('Turma salva.');
+  };
   app.querySelectorAll('[data-tema]').forEach(el => el.onclick = async () => {
     const c = el.dataset.tema, ligado = el.classList.contains('on');
     el.classList.toggle('on');
@@ -1275,6 +1286,53 @@ TELAS.evoluir = async () => {
       : await sb.from('escolhas_tema').insert({ aluno_id: p.id, tema: c });
     if (r.error) { el.classList.toggle('on'); toast(erroAmigavel(r.error), true); }
   });
+};
+
+// Professor: planejamento por turma
+TELAS.planejamento = async () => {
+  carregando();
+  const [turmas, alunosRes] = await Promise.all([
+    carregarTurmas(),
+    sb.from('perfis').select('id,nome,turma_id').eq('papel', 'aluno').eq('status', 'ativo').order('nome')
+  ]);
+  if (alunosRes.error) throw alunosRes.error;
+  const alunos = alunosRes.data || [];
+  const ids = alunos.map(a => a.id);
+  const temasRes = ids.length ? await sb.from('escolhas_tema').select('aluno_id,tema').in('aluno_id', ids) : { data: [] };
+  const temasPorAluno = {};
+  (temasRes.data || []).forEach(x => { (temasPorAluno[x.aluno_id] = temasPorAluno[x.aluno_id] || []).push(x.tema); });
+  const linhas = [];
+  let cards = '';
+  ['Limão Tênis', 'Marginal Tietê'].forEach(un => {
+    const ts = turmas.filter(t => t.unidade === un);
+    cards += `<h2>${esc(un)}</h2>`;
+    ts.forEach(t => {
+      const membros = alunos.filter(a => a.turma_id === t.id);
+      const cont = {};
+      const nomesComTemas = membros.map(a => {
+        const lista = (temasPorAluno[a.id] || []).map(c => rotuloTema(c).texto);
+        (temasPorAluno[a.id] || []).forEach(c => { cont[c] = (cont[c] || 0) + 1; });
+        return { nome: a.nome, lista };
+      });
+      const repetidos = Object.entries(cont).filter(([, v]) => v > 1).sort((x, y) => y[1] - x[1]).map(([c]) => rotuloTema(c).texto);
+      const linha = `${t.nome} (${t.horario}): ${membros.length} aluno(s)` + (nomesComTemas.length ? nomesComTemas.map(x => `\n  ${x.nome}: ${x.lista.join(', ') || 'sem temas'}`).join('') : '') + (repetidos.length ? `\n  Temas em comum: ${repetidos.join(', ')}` : '');
+      linhas.push(linha);
+      cards += `<div class="card" style="margin-bottom:10px"><div class="t">${esc(t.nome)}</div><div class="sub">${esc(t.horario)} · ${membros.length} aluno(s)</div>
+        ${membros.length ? nomesComTemas.map(x => `<div style="margin-top:8px"><span class="t" style="font-size:14px">${esc(primeiroNome(x.nome))}</span> <span class="sub">${x.lista.length ? esc(x.lista.join(' · ')) : 'sem temas'}</span></div>`).join('') : '<div class="sub" style="margin-top:6px">Nenhum aluno nesta turma ainda.</div>'}
+        ${repetidos.length ? `<div style="margin-top:8px;color:#D4D4D4">Em comum: ${esc(repetidos.join(' · '))}</div>` : ''}</div>`;
+    });
+  });
+  const resumo = linhas.join('\n\n');
+  app.innerHTML = `<h1>Planejamento por turma</h1>
+    <p class="sub">Alunos ativos com turma e temas escolhidos. Copie o resumo abaixo e cole no Claude para montar o mesociclo.</p>
+    <h2>Resumo para o Claude</h2>
+    <textarea id="resumo" readonly style="width:100%;min-height:160px;font:13px 'IBM Plex Mono',monospace">${esc(resumo)}</textarea>
+    <button class="btn sec" id="copiar" style="margin-top:8px">Copiar resumo</button>
+    ${cards}`;
+  $('#copiar').onclick = async () => {
+    try { await navigator.clipboard.writeText($('#resumo').value); toast('Resumo copiado.'); }
+    catch (e) { $('#resumo').select(); toast('Selecione e copie o texto.', true); }
+  };
 };
 
 // Professor: temas escolhidos pelo aluno (na ficha)
