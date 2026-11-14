@@ -99,6 +99,55 @@ input[type=date]{min-height:46px}
 .dados div span{display:block;font-size:12px;color:var(--texto-suave)}
 .legenda{display:flex;gap:16px;font-size:12px;color:var(--texto-suave);margin-bottom:8px}
 .legenda i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.sc-placar table{width:100%;border-collapse:collapse}
+.sc-placar td{padding:6px 4px;font:500 20px 'IBM Plex Mono',monospace;text-align:center;width:38px}
+.sc-placar td.sc-n{font:600 15px 'Inter',sans-serif;text-align:left;width:auto}
+.sc-placar td.sc-p{color:var(--dourado);width:54px}
+.sc-bola{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dourado);margin-right:8px}
+.sc-bola.off{background:transparent}
+.sc-tit{font-size:17px;font-weight:600;text-align:center;margin:18px 0 6px}
+.sc-rally{display:flex;flex-direction:column;align-items:center;justify-content:center;width:168px;height:168px;margin:16px auto 10px;border-radius:50%;border:3px solid var(--dourado);background:rgba(184,150,62,.1);color:var(--texto);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+.sc-rally:active{background:rgba(184,150,62,.32)}
+.sc-rally b{font:600 60px 'IBM Plex Mono',monospace;line-height:1}
+.sc-rally span{font-size:12px;color:var(--texto-suave);margin-top:6px}
+.sc-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.sc-fim{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sc-fim .col{display:flex;flex-direction:column;gap:8px}
+.sc-fim h3{font-size:13px;font-weight:600;text-align:center}
+.sc-b{background:var(--superficie2);border:1px solid var(--borda);border-radius:10px;padding:16px 6px;font:600 14px 'Inter',sans-serif;color:var(--texto);cursor:pointer;touch-action:manipulation}
+.sc-b.g{border-color:var(--dourado);color:var(--dourado)}
+.sc-b.w{border-color:var(--positivo);color:var(--positivo)}
+.sc-b.ef{border-color:#E0B93B;color:#E0B93B}
+.sc-b.en{border-color:var(--negativo);color:var(--negativo)}
+.rot-g{font-size:12px;color:var(--texto-suave);margin:16px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--superficie2);border:1px solid var(--borda);border-radius:999px;padding:10px 16px;font:500 14px 'Inter',sans-serif;color:var(--texto);cursor:pointer;touch-action:manipulation}
+.chip.on{background:var(--dourado);border-color:var(--dourado);color:#0A0A0A}
+.zonas{display:flex;flex-direction:column;gap:6px}
+.sc-rede{border-bottom:2px dashed var(--texto-suave);text-align:center;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--texto-suave);padding-bottom:4px;margin-bottom:2px}
+.zona{border:1px solid var(--z);border-left-width:6px;border-radius:10px;background:transparent;color:var(--texto);text-align:left;padding:9px 14px;font:600 14px 'Inter',sans-serif;cursor:pointer;touch-action:manipulation}
+.zona small{display:block;font-weight:400;font-size:12px;color:var(--texto-suave)}
+.zona.on{background:var(--z);color:#0A0A0A}
+.zona.on small{color:#0A0A0A}
+.z-verde{--z:#4CAF7A}.z-amarela{--z:#E0B93B}.z-vermelha{--z:#D9534F}.z-roxa{--z:#8E5BD6}
+.sc-z{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--z);margin-right:8px}
+.sc-log{font-size:13px;color:var(--texto-suave);padding:6px 0;border-bottom:1px solid var(--borda)}
+.quadra{width:100%;height:auto;display:block;border-radius:10px;touch-action:none;user-select:none;-webkit-user-select:none}
+body.sc-q #topo,body.sc-q #nav{display:none!important}
+body.sc-q main{max-width:none;padding:8px 8px 16px}
+.sc-wrap{display:flex;flex-direction:column;gap:10px}
+.sc-col{display:flex;flex-direction:column;gap:8px}
+.sc-pn .sc-b{width:100%;padding:13px 6px}
+.sc-mini td{font-size:16px;padding:3px 4px;width:30px}
+.sc-mini td.sc-n{font-size:14px}
+.sc-mini.card{padding:10px 12px}
+.sc-cont{text-align:center;margin:4px 0 6px}
+.sc-cont b{font:600 40px 'IBM Plex Mono',monospace;color:var(--dourado);line-height:1.1;display:block}
+.sc-cont span{font-size:12px;color:var(--texto-suave)}
+.sc-links{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-top:14px}
+.sc-links .link{font-size:13px}
+.sc-topo .btn{margin-top:10px;padding:11px 10px}
+@media(orientation:landscape){body.sc-q .sc-wrap{flex-direction:row;align-items:flex-start}body.sc-q .sc-qd{flex:1;min-width:0}body.sc-q .sc-pn{width:236px;max-height:calc(100vh - 16px);overflow-y:auto}body.sc-q .sc-dica{display:none}body.sc-q .quadra{max-height:calc(100vh - 16px)}}
 @media(min-width:720px){.modal{border-radius:16px;margin-bottom:10vh}.grid4{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
@@ -201,8 +250,9 @@ function marcarNav(aba) { document.querySelectorAll('#nav button').forEach(b => 
 const TELAS = {};
 async function ir(tela, params = {}) {
   limparCharts(); window.scrollTo(0, 0);
+  document.body.classList.remove('sc-q');
   const prof = ehProf();
-  const aba = { painel:'painel', partidas:'partidas', partida: prof ? 'alunos' : 'partidas', evolucao: prof ? 'alunos' : 'evolucao', perfil:'perfil', alunos:'alunos', ficha:'alunos', novaPartida:'alunos', novaAvaliacao:'alunos' }[tela];
+  const aba = { painel:'painel', partidas:'partidas', partida: prof ? 'alunos' : 'partidas', evolucao: prof ? 'alunos' : 'evolucao', perfil:'perfil', alunos:'alunos', ficha:'alunos', novaPartida:'alunos', novaAvaliacao:'alunos', scoutNovo:'alunos', scout:'alunos' }[tela];
   marcarNav(aba);
   try { await TELAS[tela](params); }
   catch (e) {
@@ -443,6 +493,8 @@ TELAS.partida = async ({ id }) => {
   carregando();
   const { data: p, error } = await sb.from('partidas').select('*, estatisticas(*)').eq('id', id).single();
   if (error) throw error;
+  let pts = [];
+  try { const rp = await sb.from('pontos').select('*').eq('partida_id', id).order('ordem'); if (!rp.error) pts = rp.data; } catch (e) {}
   const prof = ehProf();
   let nomeAluno = 'Você';
   if (prof) { const al = await carregarPerfil(p.aluno_id); nomeAluno = primeiroNome(al.nome) || 'Aluno'; }
@@ -485,6 +537,7 @@ TELAS.partida = async ({ id }) => {
     </div>
     <h2>Resumo</h2>
     <div class="resumo">${paragrafoResumo(nomeAluno === 'Você' ? 'você' : nomeAluno, a)}${paragrafoResumo(primeiroNome(nomeAdv), b)}</div>
+    ${pontoAPonto(pts, nomeAluno, primeiroNome(nomeAdv))}
     ${prof ? `<div class="botoes" style="margin-top:8px"><button class="btn sec" id="editar">Editar</button><button class="btn perigo" id="excluir">Excluir</button></div>` : ''}`;
   $('#voltar').onclick = () => prof ? ir('ficha', { id: p.aluno_id }) : ir('partidas');
   if (prof) {
@@ -595,6 +648,7 @@ TELAS.alunos = async () => {
   if (error) throw error;
   const pend = data.filter(a => a.status === 'pendente');
   app.innerHTML = `<h1>Alunos</h1><p class="sub">${pl(data.filter(a => a.status === 'ativo').length, 'aluno ativo', 'alunos ativos')}</p>
+    ${SC ? `<div class="lista-item" id="scBanner" style="margin-top:14px;border-color:var(--dourado)"><div><div class="t">Scout em andamento</div><div class="sub">${esc(SC.alunoNome)} x ${esc(SC.advNome)} · ${SC.pontos.length} pontos</div></div><span class="badge ouro">Continuar</span></div>` : ''}
     ${pend.length ? `<h2>Aguardando aprovação (${pend.length})</h2>${pend.map(a => `<div class="card">
       <div class="linha"><div><div style="font-weight:600">${esc(a.nome || 'Sem nome')}</div><div class="sub">${esc(a.unidade || 'Unidade não informada')}${a.telefone ? ' · ' + esc(a.telefone) : ''}</div></div>
       <span class="badge">declarou ${a.nivel_declarado ? Number(a.nivel_declarado).toFixed(1) : '-'}</span></div>
@@ -618,6 +672,7 @@ TELAS.alunos = async () => {
   };
   $('#busca').oninput = desenhar; $('#fUnid').onchange = desenhar; $('#fStatus').onchange = desenhar;
   desenhar();
+  if ($('#scBanner')) $('#scBanner').onclick = () => ir('scout');
   app.querySelectorAll('[data-aprovar]').forEach(b => b.onclick = async () => {
     const id = b.dataset.aprovar; const nv = app.querySelector(`[data-nivel="${id}"]`).value;
     if (!nv) { toast('Escolha o nível oficial antes de aprovar.', true); return; }
@@ -651,6 +706,7 @@ TELAS.ficha = async ({ id }) => {
       <div><label style="margin-top:0">Status</label><select id="status">${opcoes([['ativo','Ativo'],['pendente','Pendente'],['inativo','Inativo']], a.status)}</select></div>
     </div><button class="btn sec" id="salvarNivel" style="margin-top:12px">Salvar nível e status</button></div>
     <div class="botoes"><button class="btn" id="novaP" style="margin-top:4px">Nova partida</button><button class="btn sec" id="novaA" style="margin-top:4px">Nova avaliação</button></div>
+    <button class="btn" id="scoutBtn">${SC && SC.alunoId === id ? 'Continuar scout (' + SC.pontos.length + ' pontos)' : 'Scout ao vivo'}</button>
     <button class="btn sec" id="evol">Ver evolução</button>
     <h2>Partidas (${partidas.length})</h2>
     ${partidas.length ? partidas.map(itemPartida).join('') : '<div class="card vazio">Nenhuma partida ainda.</div>'}
@@ -660,6 +716,7 @@ TELAS.ficha = async ({ id }) => {
   $('#novaP').onclick = () => ir('novaPartida', { alunoId: id });
   $('#novaA').onclick = () => ir('novaAvaliacao', { alunoId: id });
   $('#evol').onclick = () => ir('evolucao', { alunoId: id });
+  $('#scoutBtn').onclick = () => SC && SC.alunoId === id ? ir('scout') : ir('scoutNovo', { alunoId: id });
   ligarPartidas(id);
   app.querySelectorAll('[data-aval]').forEach(el => el.onclick = () => ir('novaAvaliacao', { alunoId: id, avaliacaoId: el.dataset.aval }));
   $('#salvarNivel').onclick = async e => {
@@ -795,6 +852,378 @@ TELAS.novaAvaliacao = async ({ alunoId, avaliacaoId }) => {
     toast('Avaliação excluída.'); ir('ficha', { id: alunoId });
   });
 };
+
+// ===== Scout ao vivo =====
+const FORMATOS = [['tb7','Tiebreak até 7'],['tb10','Super tiebreak até 10'],['set1','1 set'],['md3','Melhor de 3 sets'],['md3st','2 sets e super tiebreak']];
+const ZONAS = [['verde','Verde','da linha de saque para a rede'],['amarela','Amarela','entre a linha de saque e a linha de base'],['vermelha','Vermelha','atrás da linha de base'],['roxa','Roxa','defesa crítica, 2 m ou mais atrás']];
+const SITUACOES = [['fundo','Fundo'],['devolucao','Devolução'],['voleio','Voleio'],['smash','Smash'],['deixada','Deixada'],['lob','Lob']];
+const DESTINOS = [['rede','Rede'],['fundo','Fundo'],['lateral','Lateral']];
+const LADOS = [['forehand','Forehand'],['backhand','Backhand']];
+const FIM_TXT = { winner: 'Winner', erro_forcado: 'Erro forçado', erro_nao_forcado: 'Erro não forçado', ace: 'Ace', dupla_falta: 'Dupla falta' };
+let SC = null;
+try { SC = JSON.parse(localStorage.getItem('carmona_scout')); } catch (e) {}
+function salvarSC() { try { SC ? localStorage.setItem('carmona_scout', JSON.stringify(SC)) : localStorage.removeItem('carmona_scout'); } catch (e) {} }
+function outro(l) { return l === 'aluno' ? 'adversario' : 'aluno'; }
+function rotulo(lista, v) { const x = lista.find(i => i[0] === v); return x ? x[1] : ''; }
+
+// Recalcula o placar inteiro a partir da lista de vencedores de cada ponto
+function placarDe(cfg, vencedores) {
+  const st = { sets: [], g: { aluno: 0, adversario: 0 }, p: { aluno: 0, adversario: 0 }, sacGame: cfg.primeiro, fim: false, vencedor: null };
+  const soTb = () => cfg.formato === 'tb7' || cfg.formato === 'tb10' || (cfg.formato === 'md3st' && st.sets.length === 2);
+  const alvoTb = () => cfg.formato === 'tb7' ? 7 : soTb() ? 10 : (st.g.aluno === 6 && st.g.adversario === 6 ? 7 : 0);
+  const sacador = () => { if (!alvoTb()) return st.sacGame; const k = st.p.aluno + st.p.adversario; return Math.floor((k + 1) / 2) % 2 === 0 ? st.sacGame : outro(st.sacGame); };
+  const fechaSet = (a, b) => {
+    st.sets.push([a, b]); st.g = { aluno: 0, adversario: 0 };
+    const alvo = cfg.formato === 'md3' || cfg.formato === 'md3st' ? 2 : 1;
+    const wa = st.sets.filter(s => s[0] > s[1]).length, wb = st.sets.filter(s => s[1] > s[0]).length;
+    if (wa === alvo) { st.fim = true; st.vencedor = 'aluno'; } else if (wb === alvo) { st.fim = true; st.vencedor = 'adversario'; }
+  };
+  for (const v of vencedores) {
+    if (st.fim) break;
+    const tb = alvoTb(), so = soTb();
+    st.p[v]++;
+    const a = st.p[v], b = st.p[outro(v)];
+    if (tb) {
+      if (a >= tb && a - b >= 2) {
+        const sa = so ? st.p.aluno : st.g.aluno + (v === 'aluno' ? 1 : 0), sb2 = so ? st.p.adversario : st.g.adversario + (v === 'adversario' ? 1 : 0);
+        st.p = { aluno: 0, adversario: 0 }; fechaSet(sa, sb2); st.sacGame = outro(st.sacGame);
+      }
+    } else if (cfg.noAd ? a >= 4 : (a >= 4 && a - b >= 2)) {
+      st.p = { aluno: 0, adversario: 0 }; st.g[v]++; st.sacGame = outro(st.sacGame);
+      if (st.g[v] >= 6 && st.g[v] - st.g[outro(v)] >= 2) fechaSet(st.g.aluno, st.g.adversario);
+    }
+  }
+  const tb = !!alvoTb(), pa = st.p.aluno, pb = st.p.adversario, T = ['0', '15', '30', '40'];
+  let txt;
+  if (tb) txt = { aluno: String(pa), adversario: String(pb) };
+  else if (pa >= 3 && pb >= 3) txt = { aluno: pa > pb ? 'AD' : '40', adversario: pb > pa ? 'AD' : '40' };
+  else txt = { aluno: T[pa], adversario: T[pb] };
+  return { sets: st.sets, g: st.g, p: st.p, txt, tb, soTb: soTb(), sacador: st.fim ? null : sacador(), fim: st.fim, vencedor: st.vencedor };
+}
+function placarTexto(pl) {
+  const s = pl.sets.map(x => x.join('-'));
+  if (!pl.fim) {
+    if (pl.soTb) { if (pl.p.aluno + pl.p.adversario) s.push(pl.p.aluno + '-' + pl.p.adversario); }
+    else if (pl.g.aluno + pl.g.adversario) s.push(pl.g.aluno + '-' + pl.g.adversario);
+  }
+  return s.join(' ');
+}
+
+// Transforma a lista de pontos nas contagens da tabela estatisticas
+function estDePontos(pts, l) {
+  const e = {}; CAMPOS.forEach(c => e[c] = 0);
+  pts.forEach(p => {
+    const ganhou = p.vencedor === l;
+    if (ganhou) { e.pontos_ganhos++; if (p.rally <= 4) e.pontos_ate_4++; else if (p.rally <= 8) e.pontos_5_a_8++; else e.pontos_9_mais++; }
+    if (p.sacador === l) {
+      e.s1_total++;
+      if (p.saque === 1) { e.s1_dentro++; if (ganhou) e.s1_ganhos++; }
+      else { e.s2_total++; if (p.desfecho !== 'dupla_falta') { e.s2_dentro++; if (ganhou) e.s2_ganhos++; } }
+      if (p.desfecho === 'ace') e.aces++;
+      if (p.desfecho === 'dupla_falta') e.duplas_faltas++;
+    } else { e.dev_jogados++; if (ganhou) e.dev_ganhos++; }
+    if (p.desfecho === 'winner' && p.autor === l) e.winners++;
+    if (p.desfecho === 'erro_nao_forcado' && p.autor === l) e['ene_' + (p.destino || 'fundo')]++;
+    if (p.desfecho === 'erro_forcado') {
+      const naDevolucao = p.rally === 1 && p.autor !== p.sacador;
+      if (p.autor === l) e.erros_forcados_sofridos++; else if (naDevolucao) e.saques_forcaram_erro++; else e.erros_provocados++;
+    }
+  });
+  return e;
+}
+
+function descPonto(p, nome) {
+  const partes = [FIM_TXT[p.desfecho] + ' de ' + nome(p.autor)];
+  if (p.lado_golpe) partes.push(rotulo(LADOS, p.lado_golpe).toLowerCase());
+  if (p.situacao && p.situacao !== 'saque' && p.situacao !== 'fundo') partes.push(rotulo(SITUACOES, p.situacao).toLowerCase());
+  if (p.destino) partes.push({ rede: 'na rede', fundo: 'no fundo', lateral: 'na lateral' }[p.destino]);
+  if (p.zona) partes.push('zona ' + p.zona);
+  if (p.rally > 1) partes.push(p.rally + ' bolas');
+  return partes.join(' · ');
+}
+
+function pontoAPonto(pts, na, nb) {
+  if (!pts || !pts.length) return '';
+  const nome = l => l === 'aluno' ? na : nb;
+  const erros = l => {
+    const er = pts.filter(p => p.autor === l && (p.desfecho === 'erro_nao_forcado' || p.desfecho === 'erro_forcado'));
+    if (!er.length) return '';
+    const linhas = [['forehand', 'Forehand'], ['backhand', 'Backhand'], [null, 'Sem lado']].map(([v, t]) => {
+      const f = er.filter(p => (p.lado_golpe || null) === v);
+      return f.length ? `<tr><td>${t}</td>${DESTINOS.map(([d]) => `<td>${f.filter(p => p.destino === d).length}</td>`).join('')}<td>${f.length}</td></tr>` : '';
+    }).join('');
+    return `<h2>Erros por golpe e destino · ${esc(nome(l))}</h2><div class="card"><table class="tabela"><thead><tr><th></th><th>Rede</th><th>Fundo</th><th>Lateral</th><th>Total</th></tr></thead><tbody>${linhas}</tbody></table><p class="sub" style="margin-top:8px">Soma erros forçados e não forçados.</p></div>`;
+  };
+  const zonas = l => {
+    const z = pts.filter(p => p.autor === l && p.zona);
+    if (!z.length) return '';
+    const linhas = ZONAS.map(([v, t]) => {
+      const f = z.filter(p => p.zona === v);
+      return f.length ? `<tr><td><i class="sc-z z-${v}"></i>${t}</td><td>${f.filter(p => p.vencedor === l).length}</td><td>${f.filter(p => p.vencedor !== l).length}</td></tr>` : '';
+    }).join('');
+    return `<h2>Última bola por zona · ${esc(nome(l))}</h2><div class="card"><table class="tabela"><thead><tr><th></th><th>Ganhou</th><th>Perdeu</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+  };
+  PTS_VER = pts;
+  const temTraj = pts.some(p => p.trajetoria);
+  return erros('aluno') + zonas('aluno') + mapaDecisivas(pts, 'aluno', nome) + erros('adversario') + zonas('adversario') + mapaDecisivas(pts, 'adversario', nome) +
+    `<h2>Ponto a ponto</h2>${temTraj ? '<p class="sub" style="margin-bottom:8px">Toque em um ponto da lista para ver a trajetória na quadra.</p><div id="ptQuadra"></div>' : ''}<details class="card" ${temTraj ? 'open' : ''}><summary style="cursor:pointer">Ver os ${pts.length} pontos</summary>${pts.map((p, i) => `<div class="sc-log" ${p.trajetoria ? `onclick="verPonto(${i})" style="cursor:pointer;color:var(--texto)"` : ''}>${i + 1}. <span class="mono">${esc(p.games || '')} ${esc(p.placar || '')}</span> ${esc(descPonto(p, nome))}</div>`).join('')}</details>`;
+}
+
+TELAS.scoutNovo = async ({ alunoId }) => {
+  carregando();
+  const [aluno, outros] = await Promise.all([
+    carregarPerfil(alunoId),
+    sb.from('perfis').select('id,nome').eq('papel', 'aluno').eq('status', 'ativo').neq('id', alunoId).order('nome').then(r => { if (r.error) throw r.error; return r.data; })
+  ]);
+  const an = primeiroNome(aluno.nome) || 'Aluno';
+  app.innerHTML = `<button class="link voltar" id="voltar">‹ ${esc(an)}</button>
+    <h1>Scout ao vivo</h1><p class="sub">${esc(aluno.nome)}</p>
+    ${SC ? `<div class="card" style="margin-top:14px;border-color:var(--negativo)">Há um scout em andamento de ${esc(SC.alunoNome)} com ${SC.pontos.length} pontos. Começar outro descarta esse.</div>` : ''}
+    <form id="f">
+      <label>Adversário</label><select name="adversario_id" id="advSel">${opcoes([['', 'Não é aluno (digitar o nome)'], ...outros.map(o => [o.id, o.nome])], '')}</select>
+      <input name="adversario" id="advNome" placeholder="Nome do adversário" style="margin-top:8px">
+      <label>Como marcar</label><select name="modo">${opcoes([['quadra', 'Na quadra, tocando onde a bola foi batida'], ['botoes', 'Botões rápidos']], 'quadra')}</select>
+      <label>Formato</label><select name="formato">${opcoes(FORMATOS, 'set1')}</select>
+      <label>Quem saca primeiro</label><select name="primeiro" id="primSel"><option value="aluno">${esc(an)}</option><option value="adversario">Adversário</option></select>
+      <label class="check"><input type="checkbox" name="noAd"> Sem vantagem (ponto decisivo no 40 iguais)</label>
+      <label class="check hidden" id="espelhoBox"><input type="checkbox" id="espelho" checked> Salvar também para o adversário, com os lados invertidos</label>
+      <button class="btn" type="submit">Começar</button>
+    </form>`;
+  const advSel = $('#advSel'), advNome = $('#advNome');
+  const at = () => {
+    advNome.classList.toggle('hidden', !!advSel.value); $('#espelhoBox').classList.toggle('hidden', !advSel.value);
+    $('#primSel').options[1].text = primeiroNome(advSel.value ? advSel.options[advSel.selectedIndex].text : advNome.value) || 'Adversário';
+  };
+  advSel.onchange = at; advNome.oninput = at;
+  $('#voltar').onclick = () => ir('ficha', { id: alunoId });
+  $('#f').onsubmit = ev => {
+    ev.preventDefault(); const fd = new FormData(ev.target);
+    const advId = fd.get('adversario_id') || null;
+    const advCompleto = advId ? advSel.options[advSel.selectedIndex].text : (fd.get('adversario') || '').trim();
+    SC = { alunoId, alunoNome: an, alunoCompleto: aluno.nome, advId, advCompleto: advCompleto || null, advNome: primeiroNome(advCompleto) || 'Adversário',
+      espelho: !!advId && $('#espelho').checked, data: hoje(), modo: fd.get('modo'), cfg: { formato: fd.get('formato'), primeiro: fd.get('primeiro'), noAd: !!fd.get('noAd') },
+      pontos: [], est: { fase: 'saque', saque: 1, rally: 0 } };
+    salvarSC(); ir('scout');
+  };
+};
+
+function scRegistrar(dados) {
+  const pl = placarDe(SC.cfg, SC.pontos.map(p => p.vencedor));
+  SC.pontos.push(Object.assign({ sacador: pl.sacador, saque: SC.est.saque, set_n: pl.sets.length + 1, games: pl.soTb ? '' : pl.g.aluno + '-' + pl.g.adversario,
+    placar: pl.txt.aluno + '-' + pl.txt.adversario, lado_golpe: null, situacao: null, destino: null, zona: null }, dados));
+  SC.est = { fase: 'saque', saque: 1, rally: 0 };
+  salvarSC(); TELAS.scout();
+}
+
+TELAS.scout = async () => {
+  if (!SC) { ir('alunos'); return; }
+  const R = () => TELAS.scout();
+  const pl = placarDe(SC.cfg, SC.pontos.map(p => p.vencedor));
+  const nome = l => l === 'aluno' ? SC.alunoNome : SC.advNome;
+  const naQuadra = SC.modo === 'quadra' && !pl.fim;
+  document.body.classList.toggle('sc-q', naQuadra);
+  if (naQuadra) { scQuadra(pl, nome, R); return; }
+  const e = SC.est, sac = pl.sacador;
+  const linha = l => `<tr><td class="sc-n"><i class="sc-bola ${!pl.fim && sac === l ? '' : 'off'}"></i>${esc(nome(l))}</td>${pl.sets.map(s => `<td>${s[l === 'aluno' ? 0 : 1]}</td>`).join('')}${pl.fim ? '' : `${pl.soTb ? '' : `<td>${pl.g[l]}</td>`}<td class="sc-p">${pl.txt[l]}</td>`}</tr>`;
+  let corpo;
+  if (pl.fim) {
+    corpo = `<div class="sc-tit">Partida encerrada</div><p class="sub" style="text-align:center">Vitória de ${esc(nome(pl.vencedor))} por ${esc(placarTexto(pl))}</p><button class="btn" id="scSalvar">Salvar partida</button>`;
+  } else if (e.fase === 'saque') {
+    corpo = `<div class="sc-tit">${e.saque}º saque de ${esc(nome(sac))}</div>
+      <div class="sc-3"><button class="sc-b g" id="scIn">Dentro</button><button class="sc-b w" id="scAce">Ace</button><button class="sc-b en" id="scFalta">${e.saque === 1 ? 'Falta' : 'Dupla falta'}</button></div>`;
+  } else if (e.fase === 'rally') {
+    const naBola = (e.rally + 1) % 2 === 1 ? sac : outro(sac);
+    const col = l => `<div class="col"><h3>${esc(nome(l))}${naBola === l ? ' <span class="sub">· na bola</span>' : ''}</h3>
+      <button class="sc-b w" data-fim="winner|${l}">Winner</button><button class="sc-b ef" data-fim="erro_forcado|${l}">Erro forçado</button><button class="sc-b en" data-fim="erro_nao_forcado|${l}">Erro não forçado</button></div>`;
+    corpo = `<button class="sc-rally" id="scMais"><b>${e.rally}</b><span>${e.rally === 1 ? 'bola em quadra' : 'bolas em quadra'}</span></button>
+      <p class="sub" style="text-align:center">Toque a cada bola que cair dentro. Na última bola do ponto, escolha o desfecho. <button class="link" id="scMenos" style="font-size:13px">Tirar 1</button></p>
+      <div class="sc-fim" style="margin-top:14px">${col('aluno')}${col('adversario')}</div>`;
+  } else {
+    const f = e.fim, d = e.det, erro = f.tipo !== 'winner';
+    const grupo = (g, lista) => `<div class="chips" data-g="${g}">${lista.map(([v, t]) => `<button class="chip ${d[g] === v ? 'on' : ''}" data-v="${v}">${t}</button>`).join('')}</div>`;
+    corpo = `<div class="sc-tit">${FIM_TXT[f.tipo]} de ${esc(nome(f.autor))}</div><p class="sub" style="text-align:center">Ponto para ${esc(nome(erro ? outro(f.autor) : f.autor))}</p>
+      ${erro ? `<div class="rot-g">Onde a bola foi</div>${grupo('destino', DESTINOS)}` : ''}
+      <div class="rot-g">Golpe</div>${grupo('lado_golpe', LADOS)}
+      <div class="rot-g">Situação</div>${grupo('situacao', SITUACOES)}
+      <div class="rot-g">Onde ${esc(nome(f.autor))} estava na quadra</div>
+      <div class="zonas" data-g="zona"><div class="sc-rede">rede</div>${ZONAS.map(([v, t, ds]) => `<button class="zona z-${v} ${d.zona === v ? 'on' : ''}" data-v="${v}">${t}<small>${ds}</small></button>`).join('')}</div>
+      <div class="botoes"><button class="btn sec" id="scVoltar">Voltar</button><button class="btn" id="scOk" ${erro && !d.destino ? 'disabled' : ''}>Salvar ponto</button></div>`;
+  }
+  const ult = SC.pontos.slice(-3).reverse();
+  app.innerHTML = `<div class="linha"><button class="link" id="scSair">‹ Sair sem perder</button><span class="sub">${esc(rotulo(FORMATOS, SC.cfg.formato))} · ${SC.pontos.length} pontos</span></div>
+    <div class="card sc-placar" style="margin-top:12px"><table>${linha('aluno')}${linha('adversario')}</table></div>
+    ${corpo}
+    <div class="botoes" style="margin-top:22px"><button class="btn sec peq" id="scUndo" style="flex:1">Desfazer</button>${pl.fim ? '' : '<button class="btn sec peq" id="scFim" style="flex:1">Encerrar e salvar</button>'}</div>
+    ${ult.length ? `<div style="margin-top:14px">${ult.map((p, i) => `<div class="sc-log">${SC.pontos.length - i}. ${esc(descPonto(p, nome))}</div>`).join('')}</div>` : ''}
+    <div style="text-align:center;margin-top:18px">${pl.fim ? '' : '<button class="link" id="scModo" style="font-size:13px;margin-right:18px">Marcar na quadra</button>'}<button class="link" id="scDesc" style="color:var(--negativo);font-size:13px">Descartar scout</button></div>`;
+  const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn; };
+  on('#scSair', () => ir('ficha', { id: SC.alunoId }));
+  on('#scIn', () => { e.fase = 'rally'; e.rally = 1; salvarSC(); R(); });
+  on('#scAce', () => scRegistrar({ vencedor: sac, autor: sac, desfecho: 'ace', situacao: 'saque', rally: 1 }));
+  on('#scFalta', () => { if (e.saque === 1) { e.saque = 2; salvarSC(); R(); } else scRegistrar({ vencedor: outro(sac), autor: sac, desfecho: 'dupla_falta', situacao: 'saque', rally: 0 }); });
+  on('#scMais', () => { e.rally++; salvarSC(); R(); });
+  on('#scMenos', () => { if (e.rally > 1) { e.rally--; salvarSC(); R(); } });
+  app.querySelectorAll('[data-fim]').forEach(b => b.onclick = () => {
+    const [tipo, autor] = b.dataset.fim.split('|');
+    e.fim = { tipo, autor }; e.fase = 'detalhe';
+    e.det = { destino: null, lado_golpe: null, situacao: e.rally === 1 && autor !== sac ? 'devolucao' : 'fundo', zona: null };
+    salvarSC(); R();
+  });
+  app.querySelectorAll('[data-g] [data-v]').forEach(b => b.onclick = () => { const g = b.parentElement.dataset.g; e.det[g] = e.det[g] === b.dataset.v ? null : b.dataset.v; salvarSC(); R(); });
+  on('#scVoltar', () => { e.fase = 'rally'; salvarSC(); R(); });
+  on('#scOk', () => { const f = e.fim, w = f.tipo === 'winner'; scRegistrar(Object.assign({ vencedor: w ? f.autor : outro(f.autor), autor: f.autor, desfecho: f.tipo, rally: e.rally + (w ? 1 : 0) }, e.det)); });
+  on('#scUndo', () => { if (e.fase !== 'saque' || e.saque === 2) SC.est = { fase: 'saque', saque: 1, rally: 0 }; else SC.pontos.pop(); salvarSC(); R(); });
+  on('#scFim', ev => { if (!SC.pontos.length) { toast('Nenhum ponto marcado ainda.', true); return; } confirmar(ev.target, 'Toque de novo para salvar', () => scoutSalvar(ev.target)); });
+  on('#scSalvar', ev => scoutSalvar(ev.target));
+  on('#scModo', () => { SC.modo = 'quadra'; SC.est = { fase: 'saque', saque: 1, rally: 0 }; salvarSC(); R(); });
+  on('#scDesc', ev => confirmar(ev.target, 'Toque de novo para descartar tudo', () => { const id = SC.alunoId; SC = null; salvarSC(); ir('ficha', { id }); }));
+};
+
+async function scoutSalvar(btn) {
+  trancar(btn, 'Salvando...');
+  const pl = placarDe(SC.cfg, SC.pontos.map(p => p.vencedor));
+  const res = pl.fim ? (pl.vencedor === 'aluno' ? 'vitória' : 'derrota') : null;
+  const fmt = rotulo(FORMATOS, SC.cfg.formato) + (SC.cfg.noAd ? ', sem vantagem' : '');
+  const criadas = [];
+  const gravar = async (alunoId, advNome, advId, pts, placar, resultado) => {
+    const r = await sb.from('partidas').insert({ aluno_id: alunoId, data: SC.data, adversario: advNome, adversario_id: advId, placar: placar || null, resultado, formato: fmt }).select('id').single();
+    if (r.error) throw r.error;
+    const pid = r.data.id; criadas.push(pid);
+    const r2 = await sb.from('estatisticas').insert([Object.assign({ partida_id: pid, lado: 'aluno' }, estDePontos(pts, 'aluno')), Object.assign({ partida_id: pid, lado: 'adversario' }, estDePontos(pts, 'adversario'))]);
+    if (r2.error) throw r2.error;
+    const r3 = await sb.from('pontos').insert(pts.map((p, i) => ({ partida_id: pid, ordem: i + 1, set_n: p.set_n, games: p.games, placar: p.placar, sacador: p.sacador, saque: p.saque, vencedor: p.vencedor,
+      desfecho: p.desfecho, autor: p.autor, lado_golpe: p.lado_golpe, situacao: p.situacao, destino: p.destino, zona: p.zona, rally: p.rally, trajetoria: p.trajetoria || null })));
+    if (r3.error) throw r3.error;
+    return pid;
+  };
+  try {
+    const pid = await gravar(SC.alunoId, SC.advCompleto, SC.advId, SC.pontos, placarTexto(pl), res);
+    if (SC.advId && SC.espelho) {
+      const inv = SC.pontos.map(p => Object.assign({}, p, { sacador: outro(p.sacador), vencedor: outro(p.vencedor), autor: outro(p.autor), games: invPlacar(p.games), placar: p.placar.split('-').reverse().join('-'),
+        trajetoria: p.trajetoria ? { p: p.trajetoria.p.map(q => [-q[0], -q[1]]), f: p.trajetoria.f ? [-p.trajetoria.f[0], -p.trajetoria.f[1]] : null } : null }));
+      await gravar(SC.advId, SC.alunoCompleto, SC.alunoId, inv, invPlacar(placarTexto(pl)), res ? (res === 'vitória' ? 'derrota' : 'vitória') : null);
+    }
+    SC = null; salvarSC(); toast('Partida salva.'); ir('partida', { id: pid });
+  } catch (err) {
+    if (criadas.length) { try { await sb.from('partidas').delete().in('id', criadas); } catch (e2) {} }
+    toast(erroAmigavel(err) + ' Os pontos continuam guardados neste aparelho.', true); soltar(btn);
+  }
+}
+
+// ===== Scout na quadra =====
+// Coordenadas em metros, origem no centro da rede. O aluno fica sempre no lado esquerdo (x negativo).
+function quadraSVG(extra, attrs) {
+  const L = 11.885, W = 5.485, S = 4.115, SL = 6.4;
+  const faixa = (a, b, cor) => [-1, 1].map(s => `<rect x="${Math.min(s * a, s * b)}" y="-8" width="${Math.abs(b - a)}" height="16" fill="${cor}" opacity=".2"/>`).join('');
+  return `<svg ${attrs || ''} class="quadra" viewBox="-16.9 -8 33.8 16" xmlns="http://www.w3.org/2000/svg"><rect x="-16.9" y="-8" width="33.8" height="16" fill="#111"/>
+    ${faixa(0, SL, '#4CAF7A')}${faixa(SL, L, '#E0B93B')}${faixa(L, L + 2, '#D9534F')}${faixa(L + 2, 16.9, '#8E5BD6')}
+    <g fill="none" stroke="#fff" stroke-width=".09"><rect x="${-L}" y="${-W}" width="${2 * L}" height="${2 * W}"/><path d="M${-L} ${-S}H${L}M${-L} ${S}H${L}M${-SL} ${-S}V${S}M${SL} ${-S}V${S}M${-SL} 0H${SL}M${-L} 0h.35M${L} 0h-.35"/></g>
+    <path d="M0 -6.2V6.2" stroke="#fff" stroke-width=".2" stroke-dasharray=".35 .25"/>${extra || ''}</svg>`;
+}
+const COR_FIM = { winner: '#4CAF7A', erro_forcado: '#E0B93B', erro_nao_forcado: '#D9534F' };
+function trajOver(P, f, cor) {
+  const todos = f ? P.concat([f]) : P;
+  let o = todos.length > 1 ? `<polyline points="${todos.map(p => p.join(',')).join(' ')}" fill="none" stroke="#B8963E" stroke-width=".14" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+  o += P.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r=".62" fill="${p[0] < 0 ? '#B8963E' : '#fff'}"/><text x="${p[0]}" y="${p[1] + .27}" font-size=".78" font-weight="700" text-anchor="middle" fill="#0A0A0A" font-family="IBM Plex Mono,monospace">${i + 1}</text>`).join('');
+  if (f) o += `<path d="M${f[0] - .45} ${f[1] - .45}l.9 .9m0 -.9l-.9 .9" stroke="${cor || '#fff'}" stroke-width=".22" stroke-linecap="round"/>`;
+  return o;
+}
+function zonaDe(p) { const d = Math.abs(p[0]); return d < 6.4 ? 'verde' : d < 11.885 ? 'amarela' : d < 13.885 ? 'vermelha' : 'roxa'; }
+function destinoDe(p) { return Math.abs(p[0]) < 1 ? 'rede' : Math.abs(p[0]) > 11.885 ? 'fundo' : Math.abs(p[1]) > 4.115 ? 'lateral' : null; }
+
+function scQuadra(pl, nome, R) {
+  const e = SC.est, sac = pl.sacador, rec = outro(sac);
+  if (!e.traj) e.traj = [];
+  const par = (pl.p.aluno + pl.p.adversario) % 2 === 0;
+  const saquePos = [sac === 'aluno' ? -12.4 : 12.4, (sac === 'aluno' ? 1 : -1) * (par ? 2 : -2)];
+  const ladoDe = p => p[0] < 0 ? 'aluno' : 'adversario';
+  const ult = e.traj[e.traj.length - 1];
+  const P = [saquePos].concat(e.fase === 'saque' ? [] : e.traj);
+  const over = trajOver(P, e.fase === 'detalhe' ? e.fimPos : null, e.fim ? COR_FIM[e.fim.tipo] : null);
+  const linha = l => `<tr><td class="sc-n"><i class="sc-bola ${sac === l ? '' : 'off'}"></i>${esc(nome(l))}</td>${pl.sets.map(s => `<td>${s[l === 'aluno' ? 0 : 1]}</td>`).join('')}${pl.soTb ? '' : `<td>${pl.g[l]}</td>`}<td class="sc-p">${pl.txt[l]}</td></tr>`;
+  let corpo;
+  if (e.fase === 'saque') {
+    corpo = `<div class="sc-tit">${e.saque}º saque de ${esc(nome(sac))}</div>
+      <div class="sc-col"><button class="sc-b g" id="scIn">Dentro</button><button class="sc-b w" id="scAce">Ace</button><button class="sc-b en" id="scFalta">${e.saque === 1 ? 'Falta' : 'Dupla falta'}</button></div>`;
+  } else if (e.fase === 'rally') {
+    corpo = `<div class="sc-cont"><b>${1 + e.traj.length}</b><span>${e.traj.length ? 'bolas no ponto' : 'saque em quadra'}</span></div>
+      ${ult ? `<p class="sub" style="text-align:center;margin-bottom:8px">Última batida: ${esc(nome(ladoDe(ult)))}. Continue tocando ou feche o ponto.</p>
+        <div class="sc-col"><button class="sc-b w" data-fim="winner">Winner</button><button class="sc-b ef" data-fim="erro_forcado">Erro forçado</button><button class="sc-b en" data-fim="erro_nao_forcado">Erro não forçado</button></div>`
+      : `<p class="sub" style="text-align:center">Toque na quadra onde ${esc(nome(rec))} bateu a devolução. Depois, um toque para cada batida.</p>`}`;
+  } else {
+    const f = e.fim, d = e.det, erro = f.tipo !== 'winner';
+    const grupo = (g, lista) => `<div class="chips" data-g="${g}">${lista.map(([v, t]) => `<button class="chip ${d[g] === v ? 'on' : ''}" data-v="${v}">${t}</button>`).join('')}</div>`;
+    corpo = `<div class="sc-tit" style="margin-top:8px">${FIM_TXT[f.tipo]} de ${esc(nome(f.autor))}</div>
+      <p class="sub" style="text-align:center">${e.fimPos ? 'Batida da zona ' + d.zona + '.' : 'Toque na quadra onde a bola foi parar.'}</p>
+      <div class="botoes sc-topo"><button class="btn sec" id="scVoltar">Voltar</button><button class="btn" id="scOk" ${erro && !d.destino ? 'disabled' : ''}>Salvar</button></div>
+      ${erro ? `<div class="rot-g">Onde a bola foi</div>${grupo('destino', DESTINOS)}` : ''}
+      <div class="rot-g">Golpe</div>${grupo('lado_golpe', LADOS)}
+      <div class="rot-g">Situação</div>${grupo('situacao', SITUACOES)}
+`;
+  }
+  app.innerHTML = `<div class="sc-wrap"><div class="sc-qd">${quadraSVG(over, 'id="scSvg"')}</div>
+    <div class="sc-pn"><div class="card sc-placar sc-mini" style="margin-bottom:8px"><table>${linha('aluno')}${linha('adversario')}</table></div>
+      <p class="sub sc-dica" style="text-align:center">Deite o celular para a quadra ficar maior.</p>
+      ${corpo}
+      <div class="sc-links"><button class="link" id="scUndo">Desfazer</button><button class="link" id="scFim">Encerrar e salvar</button><button class="link" id="scSair">Sair sem perder</button><button class="link" id="scModo">Usar botões</button></div>
+    </div></div>`;
+  const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn; };
+  on('#scIn', () => { e.fase = 'rally'; e.rally = 1; e.traj = []; salvarSC(); R(); });
+  on('#scAce', () => scRegistrar({ vencedor: sac, autor: sac, desfecho: 'ace', situacao: 'saque', rally: 1 }));
+  on('#scFalta', () => { if (e.saque === 1) { e.saque = 2; salvarSC(); R(); } else scRegistrar({ vencedor: rec, autor: sac, desfecho: 'dupla_falta', situacao: 'saque', rally: 0 }); });
+  app.querySelectorAll('[data-fim]').forEach(b => b.onclick = () => {
+    const autor = ladoDe(ult), z = zonaDe(ult);
+    e.fim = { tipo: b.dataset.fim, autor }; e.fase = 'detalhe'; e.fimPos = null;
+    e.det = { destino: null, lado_golpe: null, situacao: z === 'verde' ? 'voleio' : e.traj.length === 1 ? 'devolucao' : 'fundo', zona: z };
+    salvarSC(); R();
+  });
+  app.querySelectorAll('[data-g] [data-v]').forEach(b => b.onclick = () => { const g = b.parentElement.dataset.g; e.det[g] = e.det[g] === b.dataset.v ? null : b.dataset.v; salvarSC(); R(); });
+  on('#scVoltar', () => { e.fase = 'rally'; e.fimPos = null; salvarSC(); R(); });
+  on('#scOk', () => { const f = e.fim, w = f.tipo === 'winner'; scRegistrar(Object.assign({ vencedor: w ? f.autor : outro(f.autor), autor: f.autor, desfecho: f.tipo, rally: e.traj.length + (w ? 1 : 0), trajetoria: { p: P, f: e.fimPos || null } }, e.det)); });
+  on('#scUndo', () => {
+    if (e.fase === 'detalhe') { e.fase = 'rally'; e.fimPos = null; }
+    else if (e.fase === 'rally' && e.traj.length) e.traj.pop();
+    else if (e.fase !== 'saque' || e.saque === 2) SC.est = { fase: 'saque', saque: 1, rally: 0 };
+    else SC.pontos.pop();
+    salvarSC(); R();
+  });
+  on('#scFim', ev => { if (!SC.pontos.length) { toast('Nenhum ponto marcado ainda.', true); return; } confirmar(ev.target, 'Toque de novo para salvar', () => scoutSalvar(ev.target)); });
+  on('#scSair', () => ir('ficha', { id: SC.alunoId }));
+  on('#scModo', () => { SC.modo = 'botoes'; SC.est = { fase: 'saque', saque: 1, rally: 0 }; salvarSC(); R(); });
+  const svg = $('#scSvg');
+  svg.addEventListener('pointerdown', ev => {
+    ev.preventDefault();
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const p = [Math.round(q.x * 10) / 10, Math.round(q.y * 10) / 10];
+    if (e.fase === 'rally') {
+      const esperado = e.traj.length % 2 === 0 ? rec : sac;
+      if (ladoDe(p) === esperado) e.traj.push(p);
+      else if (e.traj.length) e.traj[e.traj.length - 1] = p;
+      else { toast('A devolução é de ' + nome(rec) + '. Toque no lado dele.', true); return; }
+    } else if (e.fase === 'detalhe') {
+      e.fimPos = p;
+      if (e.fim.tipo !== 'winner') { const d = destinoDe(p); if (d) e.det.destino = d; }
+    } else { toast('Marque primeiro o saque nos botões.'); return; }
+    salvarSC(); R();
+  });
+}
+
+// Mapas na página da partida
+let PTS_VER = [];
+function mapaDecisivas(pts, l, nome) {
+  const f = pts.filter(p => p.autor === l && p.trajetoria && p.trajetoria.f && COR_FIM[p.desfecho]);
+  if (!f.length) return '';
+  const over = f.map(p => { const a = p.trajetoria.p[p.trajetoria.p.length - 1], b = p.trajetoria.f, c = COR_FIM[p.desfecho];
+    return `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width=".13" opacity=".9"/><circle cx="${a[0]}" cy="${a[1]}" r=".3" fill="${c}"/><circle cx="${b[0]}" cy="${b[1]}" r=".2" fill="none" stroke="${c}" stroke-width=".1"/>`; }).join('');
+  return `<h2>Bolas decisivas · ${esc(nome(l))}</h2><div class="card"><div class="legenda"><span><i style="background:#4CAF7A"></i>Winner</span><span><i style="background:#E0B93B"></i>Erro forçado</span><span><i style="background:#D9534F"></i>Erro não forçado</span></div>${quadraSVG(over)}<p class="sub" style="margin-top:8px">Cada linha sai de onde a bola foi batida e termina onde ela parou.</p></div>`;
+}
+function verPonto(i) {
+  const p = PTS_VER[i]; if (!p || !p.trajetoria) return;
+  const box = $('#ptQuadra'); if (!box) return;
+  box.innerHTML = `<div class="card"><div class="sub" style="margin-bottom:8px">Ponto ${i + 1} · ${esc(p.games || '')} ${esc(p.placar || '')} · ${esc(FIM_TXT[p.desfecho])}</div>${quadraSVG(trajOver(p.trajetoria.p, p.trajetoria.f, COR_FIM[p.desfecho]))}</div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 </script>
 </body>
 </html>
