@@ -1256,6 +1256,15 @@ function rotuloTema(codigo) {
   return { grupo: '', texto: codigo };
 }
 
+function rotuloTurma(t) {
+  const [dia, hora] = (t.horario || '').split(' ');
+  const inicio = (hora || '').split('-')[0];
+  const eKids = /KIDS/i.test(t.nome || '');
+  const n = t.nivel && !isNaN(Number(t.nivel)) ? Number(t.nivel).toFixed(1) : (t.nivel || '');
+  const fim = eKids ? n : (t.formato === 'individual' ? `Individual ${n}` : n);
+  return `${dia} ${inicio} - ${fim}`;
+}
+
 TELAS.evoluir = async () => {
   carregando();
   const p = S.perfil;
@@ -1271,7 +1280,7 @@ TELAS.evoluir = async () => {
     <h1>Onde quero evoluir</h1>
     <p class="sub">Escolha sua turma e toque no que faz sentido para você. Pode marcar mais de um. Você pode mudar quando quiser.</p>
     <h2>Minha turma</h2>
-    <select id="minhaTurma">${opcoes(turmas.map(x => [x.id, `${x.nome} · ${x.unidade} · ${x.horario}`]), turmaAtual, true)}</select>
+    <select id="minhaTurma">${opcoes(turmas.map(x => [x.id, rotuloTurma(x)]), turmaAtual, true)}</select>
     ${TEMAS_ALUNO.map(g => `<h2>${esc(g.titulo)}</h2>${g.blocos.map(b => `<p class="sub" style="margin:14px 0 8px;color:#D4D4D4">${esc(b.pergunta)}</p><div class="chips">${b.opcoes.map(([c, tx]) => `<button class="chip ${escolhidos.has(c) ? 'on' : ''}" data-tema="${c}">${esc(tx)}</button>`).join('')}</div>`).join('')}`).join('')}`;
   $('#voltar').onclick = () => ir('painel');
   $('#minhaTurma').onchange = async e => {
